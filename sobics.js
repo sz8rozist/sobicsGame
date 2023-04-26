@@ -3,6 +3,7 @@ let game_area = $(".game");
 var time = 0;
 
 const gameboard = document.getElementById("gameboard");
+const character_container = document.getElementById("character_container");
 
 let score = 0;
 var blockColors = ["red", "green", "blue", "yellow", "purple"];
@@ -25,29 +26,82 @@ $(document).ready(function () {
   mapFeltolt();
   spawnCharacter();
   drawBoard();
-  timer();
 
   console.log(blocks);
 
-  document.addEventListener("keydown", moveBox);
+  //document.addEventListener("keydown", moveBox);
 
   /* blocks.forEach(function(element){
     console.log(element, element.style.top);
   });*/
 
+  /* Amikor az egér mozog, a kódban számítódik a deltaX értéke, amely meghatározza a child elem mozgatásának mértékét a balra és jobbra mozgatás során. Ezután kiszámítjuk a child elem új pozícióját a parent elemen belül, figyelembe véve, hogy ne lépje túl a parent elem határait */
+  $("#game_container").on("mousemove", function (event) {
+    var deltaX = event.pageX - currentX;
+    var newPosition = $("#character_container").position().left + deltaX;
+
+    if (newPosition < 0) {
+      newPosition = 0;
+    } else if (
+      newPosition >
+      $(this).width() - $("#character_container").width()
+    ) {
+      newPosition = $(this).width() - $("#character_container").width();
+    }
+
+    $("#character_container").css("left", newPosition);
+    currentX = event.pageX;
+  });
+
+  $("#game_container").click(function (event) {
+    var parentPosition = $(this).position().left; // Parent div pozíciója az oldal bal szélétől
+    var clickPosition = event.pageX - parentPosition; // A kattintás pozíciója az X tengelyen a parent div-en belül
+
+    var columnNumber = Math.floor(clickPosition / 209.3); // Az oszlop számának meghatározása a kattintás pozíciója alapján
+
+    removeBlock(columnNumber);
+    console.log("Column number: " + columnNumber);
+  });
+
+  function removeBlock(columnNumber) {
+    var kezben_levo_blokk = $("#kezben_levo_blokk");
+    var column = blocks.get(columnNumber);
+    console.log(column);
+    if (kezben_levo_blokk.hasClass("hide")) {
+      var popped = column.pop();
+      //console.log(popped.style.backgroundColor);
+      //console.log(blocks);
+
+      $("#kezben_levo_blokk").removeClass("hide");
+      $("#kezben_levo_blokk").css(
+        "background-color",
+        popped.style.backgroundColor
+      );
+      drawBoard();
+      return;
+    }
+    console.log("Van kézben");
+    var new_block = document.createElement("div");
+    new_block.classList.add("block");
+    new_block.style.backgroundColor = kezben_levo_blokk.css("background-color");
+    var pushed = column.push(new_block);
+    kezben_levo_blokk.addClass("hide");
+    kezben_levo_blokk.css("background-color", "");
+    // console.log(column);
+    //  console.log(blocks);
+    drawBoard();
+  }
+
   function spawnCharacter() {
     let character = document.createElement("img");
     character.src = "male/Walk (5).png";
-    character.style.position = "absolute";
-    character.style.left = "0";
-    character.style.bottom = "0";
-    character.style.width = "130px";
-    character.style.height = "130px";
+    character.style.width = "160px";
+    character.style.height = "160px";
     character.setAttribute("id", "character");
-    gameboard.appendChild(character);
+    character_container.appendChild(character);
   }
 
-  function timer() {
+  /*function timer() {
     let progress = 0;
     const progressBar = document.querySelector(".progress-bar");
     setInterval(function () {
@@ -58,10 +112,10 @@ $(document).ready(function () {
       time += 1;
       progressBar.style.width = progress * 10 + "%";
     }, 1000);
-  }
+  }*/
 
   function mapFeltolt() {
-    for (var i = 0; i < 13; i++) {
+    for (var i = 0; i < 9; i++) {
       var key = i;
       var value = [];
       for (var j = 0; j < 5; j++) {
@@ -76,39 +130,26 @@ $(document).ready(function () {
     }
   }
 
-  function moveBox(event) {
-    var box = document.getElementById("character");
-    var boxWidth = box.offsetWidth;
-    // var boxHeight = box.offsetHeight;
-    var boxLeft = parseInt(box.style.left);
-    switch (event.key) {
-      case "ArrowUp":
-        // box.style.top = Math.max(boxTop - boxHeight, 0) + "px";
-        break;
-      case "ArrowLeft":
-        box.style.left = Math.max(boxLeft - boxWidth, 0) + "px";
-        break;
-      case "ArrowRight":
-        box.style.left =
-          Math.min(boxLeft + boxWidth, window.innerWidth - boxWidth) + "px";
-        break;
-    }
-  }
-
   function drawBoard() {
-    const table = document.createElement('table');
-    for (let i = 0; i < 5; i++) {
-      const tr = document.createElement('tr');
-      for (let j = 0; j < 13; j++) {
-        const td = document.createElement('td');
-        const block = blocks.get(j)[i]; // megkapjuk a blokkot a Map-ből
-        td.append(block);
-        tr.appendChild(td);
-      }
-      table.appendChild(tr);
+    if (gameboard.hasChildNodes()) {
+      gameboard.textContent = "";
     }
-    
-    // hozzáadjuk a táblázatot a DOM-hoz
-    gameboard.appendChild(table);
+    let blockCount = 0;
+    blocks.forEach((column) => (blockCount += column.length));
+    for (let i = 0; i < 16; i++) {
+      for (let j = 0; j < 9; j++) {
+        const block = blocks.get(j)[i]; // megkapjuk a blokkot a Map-ből
+        //console.log(block);
+        if (block == undefined) {
+          const removed = document.createElement("div");
+          //var text = document.createTextNode("");
+          removed.classList.add("block");
+          // removed.appendChild(text);
+          gameboard.appendChild(removed);
+        } else {
+          gameboard.appendChild(block);
+        }
+      }
+    }
   }
 });
