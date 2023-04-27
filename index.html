@@ -1,31 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="jquery-ui.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <title>Sobics Game</title>
-</head>
-<body>
-<div id="gamearea">
-    <div class="main_container">
+  </head>
+  <body>
+    <div id="gamearea">
+      <!--<div class="main_container">
         <img src="male/Idle (7).png">
         <button id="start_game_btn" style="--clr:#0FF0FC"><span>Játék kezdése</span><i></i></button>
-    </div>
-    <div class="game">
+    </div>-->
+      <div id="music" onclick="togglePlay()"><i class="fa-solid fa-music fa-beat"></i> Zene</div>
+
+      <div id="dialog" title="Üdvözöllek ez itt a Sobics!">
+        <p>
+          A játékot az egérrel tudod majd irányítani. Az egered fogja követni a
+          karakter, ha kattintasz egyet a pályán a megfelelő oszlopban akkor a
+          karakter kezébe kerül egy blokk majd azt át lehet helyezni valahova
+          máshová. Az áthelyezés után ha az oszlopban lévő új blokkon kívül
+          található még három ugyanolyan színű akkor fejenként 1000 pont üti a
+          markod. Jó játékot kívának!
+        </p>
+        <p>Kérlek írd be a neved hogy felkerülj a top listára!</p>
+        <label for="name">Név:</label>
+        <input type="text" name="name" id="name" />
+      </div>
+      <div id="game_over_dialog" title="A játék véget ért!">
+        <div class="game_over_content"></div>
+      </div>
+      <div class="game">
         <div id="game_container">
-            <div id="gameboard">
-             
-            </div>
-            <div id="character_container">
-                <!--<img src="male/Attack (1).png" width="130" height="130" alt="">-->
-                <span id="kezben_levo_blokk" class="hide"></span>
-            </div>
+          <div id="progressbar"><div class="progress-label">0</div></div>
+          <div id="gameboard"></div>
+          <div id="character_container">
+            <!--<img src="male/Attack (1).png" width="130" height="130" alt="">-->
+            <span id="kezben_levo_blokk" class="hide"></span>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<script src="jquery-3.6.4.min.js"></script>
-<script src="sobics.js"></script>
-</body>
+
+    <audio loop id="myAudio">
+      <source src="Wolf Asylum - Hubris.mp3" type="audio/ogg" />
+    </audio>
+
+    <script src="jquery-3.6.4.min.js"></script>
+    <script src="sobics.js"></script>
+    <script src="jquery-ui.js"></script>
+  </body>
 </html>

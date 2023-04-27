@@ -3,35 +3,32 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
+  background-color: #394867;
+}
+
+#music{
+  width: 1000px;
+  position: relative;
+  margin: 0 auto;
+  padding: 4px;
+  text-align: right;
+  color: white;
+  cursor: pointer;
+}
+#music i {
+  color: yellow;
 }
 
 #gamearea {
   height: 100%;
   width: 100%;
-}
-
-.main_container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: #27272c;
-}
-
-.main_container img {
-  width: 10%;
-}
-
-.game {
-  min-height: 100vh;
+  margin-top: 60px;
 }
 
 #game_container {
   background-image: url("background.jpg");
-  width: 100vw;
-  height: 100vh;
+  width: 1000px;
+  height: 700px;
   margin: 0 auto;
   position: relative;
 }
@@ -41,124 +38,66 @@ body {
 }
 
 .block {
-  width: 10.9vw;
-  height: 5vh;
+  width: 96px;
+  height: 30px;
   margin: 2px;
   display: inline-block;
   float: left;
+  border-radius: 20px;
+  transform: scale(0);
+  transition: 0.5s;
+}
+
+.block.animate{
+  transform: scale(1);
 }
 
 #character_container {
   position: absolute;
   left: 0;
   bottom: 0;
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
 }
 
 #kezben_levo_blokk {
-  width: 10.9vw;
-  height: 5vh;
+  width: 96px;
+  height: 30px;
   position: absolute;
   top: 65%;
+  left: 25%;
+  transition: opacity .5s ease-in-out;
+  border-radius: 20px;
+}
+#progressbar.animate{
+  transform: scale(1);
+}
+#progressbar{
+  transform: scale(0);
+  transition: 0.5s;
+}
+
+#progressbar .ui-progressbar-value {
+  background-color: rgb(48, 81, 225);
+  color: white;
+}
+
+.progress-label {
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.ui-progressbar{
+  height: 1em !important;
 }
 
 .hide {
-  display: none;
-}
-button {
-  position: relative;
-  background: #444;
-  color: #fff;
-  text-decoration: none;
-  text-transform: uppercase;
-  border: none;
-  letter-spacing: 0.1rem;
-  font-size: 1rem;
-  padding: 1rem 3rem;
-  transition: 0.2s;
+  opacity: 0;
 }
 
-button:hover {
-  letter-spacing: 0.2rem;
-  padding: 1.1rem 3.1rem;
-  background: var(--clr);
-  color: var(--clr);
-  /* box-shadow: 0 0 35px var(--clr); */
-  animation: box 3s infinite;
-}
-
-button::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  background: #272822;
-}
-
-button span {
-  position: relative;
-  z-index: 1;
-}
-button i {
-  position: absolute;
-  inset: 0;
-  display: block;
-}
-
-button i::before {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 2px;
-  left: 80%;
-  top: -2px;
-  border: 2px solid var(--clr);
-  background: #272822;
-  transition: 0.2s;
-}
-
-button:hover i::before {
-  width: 15px;
-  left: 20%;
-  animation: move 3s infinite;
-}
-
-button i::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 2px;
-  left: 20%;
-  bottom: -2px;
-  border: 2px solid var(--clr);
-  background: #272822;
-  transition: 0.2s;
-}
-
-button:hover i::after {
-  width: 15px;
-  left: 80%;
-  animation: move 3s infinite;
-}
-
-@keyframes move {
-  0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(5px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-@keyframes box {
-  0% {
-    box-shadow: #27272c;
-  }
-  50% {
-    box-shadow: 0 0 25px var(--clr);
-  }
-  100% {
-    box-shadow: #27272c;
-  }
+.show{
+  opacity: 1;
 }
