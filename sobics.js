@@ -4,7 +4,14 @@ const character_container = document.getElementById("character_container");
 
 var playerName = "";
 var score = 0;
-var blockColors = ["red", "green", "blue", "yellow", "purple"];
+/* RED, GREEN, BLUE, YELLOW, PURPLE */
+var blockColors = [
+  "rgb(255, 0, 0)",
+  "rgb(0, 128, 0)",
+  "rgb(0, 0, 255)",
+  "rgb(255, 255, 0)",
+  "rgb(128, 0, 128)",
+];
 var blocks = new Map();
 var topList = [];
 var myAudio = document.getElementById("myAudio");
@@ -88,9 +95,10 @@ $(document).ready(function () {
     var pushed = column.push(new_block);
     kezben_levo_blokk.addClass("hide");
     kezben_levo_blokk.css("background-color", "");
-    drawBoard();
 
     checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
+
+    drawBoard();
   }
 
   function timer() {
@@ -101,7 +109,7 @@ $(document).ready(function () {
       progress++;
       if (progress > 10) {
         progress = 0;
-        // randomBlock();
+        randomBlock();
         drawBoard();
       }
       progressbar.progressbar({
@@ -245,12 +253,19 @@ $(document).ready(function () {
       if (blocks.has(column)) {
         // Ellenőrizd, hogy létezik-e az adott oszlop
         const divs = blocks.get(column); // Az oszlopban található div elemek tömbje
-        for (const div of divs) {
-          console.log(div.style.backgroundColor);
+        /* for (const div of divs) {
           if (div.style.backgroundColor == color) {
             // Ellenőrizd, hogy az adott div elemnek van-e kék háttérszíne
             console.log(div);
             hasSimilarDiv = true;
+          }
+        }*/
+
+        for (let i = divs.length - 1; i >= 0; i--) {
+          if (divs[i].style.backgroundColor == color) {
+            hasSimilarDiv = true;
+            console.log(divs[i]);
+            break;
           }
         }
       }
