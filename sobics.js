@@ -96,8 +96,8 @@ $(document).ready(function () {
     kezben_levo_blokk.addClass("hide");
     kezben_levo_blokk.css("background-color", "");
 
-    checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
-
+    var neighbour = checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
+    removeBlockFromMap(neighbour);
     drawBoard();
   }
 
@@ -107,14 +107,14 @@ $(document).ready(function () {
     let progress = 0;
     setInterval(function () {
       progress++;
-      if (progress > 10) {
+      if (progress > 20) {
         progress = 0;
-        randomBlock();
+        //randomBlock();
         drawBoard();
       }
       progressbar.progressbar({
         value: progress,
-        max: 10,
+        max: 20,
         change: function () {
           progressLabel.text(progress);
         },
@@ -141,8 +141,9 @@ $(document).ready(function () {
                   " pontot gyűjtöttél"
               );
               topList.push({ name: playerName, score: score });
-
               console.log(topList);
+              localStorage.setItem("toplist", JSON.stringify(topList));
+              window.location.href = "top_list.html";
               $(this).dialog("close");
             },
             "Játék újrakezdése": function () {
@@ -157,7 +158,6 @@ $(document).ready(function () {
 
   function mapFeltolt() {
     for (var i = 0; i < 10; i++) {
-      var key = i;
       var value = [];
       for (var j = 0; j < 5; j++) {
         const block = document.createElement("div");
@@ -167,7 +167,7 @@ $(document).ready(function () {
         block.style.backgroundColor = randomColor;
         value.push(block);
       }
-      blocks.set(key, value);
+      blocks.set(i, value);
     }
 
     let character = document.createElement("img");
@@ -237,7 +237,6 @@ $(document).ready(function () {
       return;
     }
     playerName = $("#name").val();
-    console.log(playerName);
     mapFeltolt();
     drawBoard();
     $("#progressbar").addClass("animate");
@@ -247,12 +246,13 @@ $(document).ready(function () {
   function checkNeightbourColumn(columnIndex, color) {
     console.log(color);
     // Szomszédos tömbök vizsgálata
-    const adjacentColumns = [columnIndex - 1, columnIndex + 1]; // Az oszlopok számai, amelyek szomszédosak az adott oszloppal
-    let hasSimilarDiv = false;
+    const adjacentColumns = [columnIndex ,columnIndex - 1, columnIndex + 1]; // Az oszlopok számai, amelyek szomszédosak az adott oszloppal
+    var hasSimilarDiv = new Map();
     for (const column of adjacentColumns) {
       if (blocks.has(column)) {
         // Ellenőrizd, hogy létezik-e az adott oszlop
         const divs = blocks.get(column); // Az oszlopban található div elemek tömbje
+        console.log(column);
         /* for (const div of divs) {
           if (div.style.backgroundColor == color) {
             // Ellenőrizd, hogy az adott div elemnek van-e kék háttérszíne
@@ -260,18 +260,22 @@ $(document).ready(function () {
             hasSimilarDiv = true;
           }
         }*/
-
+        hasSimilarDiv.set(column, []);
         for (let i = divs.length - 1; i >= 0; i--) {
           if (divs[i].style.backgroundColor == color) {
-            hasSimilarDiv = true;
             console.log(divs[i]);
-            break;
+            //hasSimilarDiv.set(column,[{index: i, block: divs[i]}]);
+            hasSimilarDiv.get(column).push({index: i, block: divs[i]});
           }
         }
       }
-      if (hasSimilarDiv) {
-        break;
-      }
+    }
+    return hasSimilarDiv;
+  }
+
+  function removeBlockFromMap(map){
+    for (const [key, value] of map.entries()) {
+      console.log(key, value);
     }
   }
 });
