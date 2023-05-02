@@ -3,7 +3,7 @@ const gameboard = document.getElementById("gameboard");
 const character_container = document.getElementById("character_container");
 const scoreEl = document.querySelector("#score");
 var playerName = "";
-var score = 0;
+var audio = new Audio("bubble.mp3");
 /* RED, GREEN, BLUE, YELLOW, PURPLE */
 var blockColors = [
   "rgb(255, 0, 0)",
@@ -17,6 +17,9 @@ var topList = [];
 var myAudio = document.getElementById("myAudio");
 myAudio.volume = 0.2;
 var isPlaying = false;
+var level = 1;
+var progressRange = 20;
+var pontszam = [8000, 16000, 20000];
 
 function togglePlay() {
   isPlaying ? myAudio.pause() : myAudio.play();
@@ -67,8 +70,6 @@ $(document).ready(function () {
     $("#character_container").css("left", newPosition);
     currentX = event.pageX;
   });
-  const scoreEl = document.querySelector("#score");
-
   $("#game_container").click(function (event) {
     var parentPosition = $(this).position().left; // Parent div pozíciója az oldal bal szélétől
     var clickPosition = event.pageX - parentPosition; // A kattintás pozíciója az X tengelyen a parent div-en belül
@@ -81,6 +82,7 @@ $(document).ready(function () {
     var column = blocks.get(columnNumber);
     if (kezben_levo_blokk.hasClass("hide")) {
       var popped = column.pop();
+      audio.play();
       //console.log(popped.style.backgroundColor);
       //console.log(blocks);
       kezben_levo_blokk.removeClass("hide");
@@ -92,9 +94,10 @@ $(document).ready(function () {
     var new_block = document.createElement("div");
     new_block.classList.add("block");
     new_block.style.backgroundColor = kezben_levo_blokk.css("background-color");
-    var pushed = column.push(new_block);
+    column.push(new_block);
     kezben_levo_blokk.addClass("hide");
     kezben_levo_blokk.css("background-color", "");
+    audio.play();
     //var neighbour = checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
     //removeBlockFromMap(neighbour, columnNumber);
     let legutoljaraBeszurtIndex = blocks.get(columnNumber).length - 1;
@@ -179,14 +182,19 @@ $(document).ready(function () {
     let progress = 0;
     setInterval(function () {
       progress++;
-      if (progress > 20) {
+      if (parseInt(scoreEl.innerHTML) == pontszam[level - 1]) {
+        level++;
+        progressRange -= 5;
+      }
+      console.log(parseInt(scoreEl.innerHTML));
+      if (progress > progressRange) {
         progress = 0;
         //randomBlock();
         drawBoard();
       }
       progressbar.progressbar({
         value: progress,
-        max: 20,
+        max: progressRange,
         change: function () {
           progressLabel.text(progress);
         },
@@ -314,7 +322,6 @@ $(document).ready(function () {
 
   function showScore(score) {
     scoreEl.textContent = score;
-    console.log($(".score").html());
     let sc = parseInt($(".score").html());
     sc += score;
     $(".score").html(sc);

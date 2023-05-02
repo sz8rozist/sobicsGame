@@ -6,7 +6,7 @@ body {
   background-color: #394867;
 }
 
-#music{
+#music {
   width: 1000px;
   position: relative;
   margin: 0 auto;
@@ -48,7 +48,7 @@ body {
   transition: 0.5s;
 }
 
-.block.animate{
+.block.animate {
   transform: scale(1);
 }
 
@@ -57,7 +57,7 @@ body {
   left: 0;
   bottom: 0;
   opacity: 0;
-  transition: opacity .5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
 }
 
 #kezben_levo_blokk {
@@ -66,13 +66,13 @@ body {
   position: absolute;
   top: 65%;
   left: 25%;
-  transition: opacity .5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
   border-radius: 20px;
 }
-#progressbar.animate{
+#progressbar.animate {
   transform: scale(1);
 }
-#progressbar{
+#progressbar {
   transform: scale(0);
   transition: 0.5s;
 }
@@ -90,7 +90,7 @@ body {
   text-shadow: 1px 1px 0 #fff;
 }
 
-.ui-progressbar{
+.ui-progressbar {
   height: 1em !important;
 }
 
@@ -98,7 +98,7 @@ body {
   opacity: 0;
 }
 
-.show{
+.show {
   opacity: 1;
 }
 
@@ -121,8 +121,13 @@ body {
 #score.hide {
   opacity: 0;
 }
-.score{
+.score {
   text-align: center;
+  color: white;
+  font-size: 26px;
+}
+
+.level {
   color: white;
   font-size: 26px;
 }
