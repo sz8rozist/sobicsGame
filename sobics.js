@@ -1,7 +1,7 @@
 var currentX = 0;
 const gameboard = document.getElementById("gameboard");
 const character_container = document.getElementById("character_container");
-
+const scoreEl = document.querySelector("#score");
 var playerName = "";
 var score = 0;
 /* RED, GREEN, BLUE, YELLOW, PURPLE */
@@ -51,7 +51,6 @@ $(document).ready(function () {
       },
     },
   });
-
   /* Amikor az egér mozog, a kódban számítódik a deltaX értéke, amely meghatározza a child elem mozgatásának mértékét a balra és jobbra mozgatás során. Ezután kiszámítjuk a child elem új pozícióját a parent elemen belül, figyelembe véve, hogy ne lépje túl a parent elem határait */
   $("#game_container").on("mousemove", function (event) {
     var deltaX = event.pageX - currentX;
@@ -68,6 +67,7 @@ $(document).ready(function () {
     $("#character_container").css("left", newPosition);
     currentX = event.pageX;
   });
+  const scoreEl = document.querySelector("#score");
 
   $("#game_container").click(function (event) {
     var parentPosition = $(this).position().left; // Parent div pozíciója az oldal bal szélétől
@@ -95,9 +95,81 @@ $(document).ready(function () {
     var pushed = column.push(new_block);
     kezben_levo_blokk.addClass("hide");
     kezben_levo_blokk.css("background-color", "");
-
-    var neighbour = checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
-    removeBlockFromMap(neighbour);
+    //var neighbour = checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
+    //removeBlockFromMap(neighbour, columnNumber);
+    let legutoljaraBeszurtIndex = blocks.get(columnNumber).length - 1;
+    let legutoljaraBeszurt = blocks
+      .get(columnNumber)
+      .at(legutoljaraBeszurtIndex);
+    // console.log(legutoljaraBeszurt);
+    //console.log(columnNumber, legutoljaraBeszurtIndex);
+    let removeBlocks = new Map();
+    var count = 0;
+    for (const [key, value] of blocks.entries()) {
+      if (key == columnNumber) {
+        for (let i = value.length - 1; i >= 0; i--) {
+          if (
+            value[i].style.backgroundColor !=
+            value[legutoljaraBeszurtIndex].style.backgroundColor
+          ) {
+            break;
+          }
+          count++;
+          removeBlocks.set(key, []);
+          //Azt a blokkot amit fellövünk ne számolja bele.
+          if (value[i] != value[legutoljaraBeszurtIndex]) {
+            removeBlocks.get(key).push(value[i]);
+          }
+        }
+      }
+      if (key == columnNumber - 1) {
+        for (let i = value.length - 1; i >= 0; i--) {
+          if (
+            value[i].style.backgroundColor !=
+            legutoljaraBeszurt.style.backgroundColor
+          ) {
+            break;
+          }
+          count++;
+          if (removeBlocks.has(key)) {
+            removeBlocks.get(key).push(value[i]);
+          } else {
+            removeBlocks.set(key, [value[i]]);
+          }
+        }
+      }
+      if (key == columnNumber + 1) {
+        for (let i = value.length - 1; i >= 0; i--) {
+          if (
+            value[i].style.backgroundColor !=
+            legutoljaraBeszurt.style.backgroundColor
+          ) {
+            break;
+          }
+          count++;
+          if (removeBlocks.has(key)) {
+            removeBlocks.get(key).push(value[i]);
+          } else {
+            removeBlocks.set(key, [value[i]]);
+          }
+        }
+      }
+    }
+    if (count >= 4) {
+      showScore(count * 1000);
+      for (const [key, value] of removeBlocks.entries()) {
+        //console.log(key, value);
+        for (let i = 0; i < value.length; i++) {
+          console.log(value[i]);
+          let blocksArray = blocks.get(key);
+          blocksArray = blocksArray.filter(
+            (elem) =>
+              elem.style.backgroundColor != value[i].style.backgroundColor
+          );
+          blocks.set(key, blocksArray);
+        }
+      }
+    }
     drawBoard();
   }
 
@@ -143,7 +215,6 @@ $(document).ready(function () {
               topList.push({ name: playerName, score: score });
               console.log(topList);
               localStorage.setItem("toplist", JSON.stringify(topList));
-              window.location.href = "top_list.html";
               $(this).dialog("close");
             },
             "Játék újrakezdése": function () {
@@ -186,8 +257,6 @@ $(document).ready(function () {
     if (gameboard.hasChildNodes()) {
       gameboard.textContent = "";
     }
-    let blockCount = 0;
-    blocks.forEach((column) => (blockCount += column.length));
     for (let i = 0; i < 16; i++) {
       for (let j = 0; j < 10; j++) {
         const block = blocks.get(j)[i]; // megkapjuk a blokkot a Map-ből
@@ -243,39 +312,19 @@ $(document).ready(function () {
     timer();
   }
 
-  function checkNeightbourColumn(columnIndex, color) {
-    console.log(color);
-    // Szomszédos tömbök vizsgálata
-    const adjacentColumns = [columnIndex ,columnIndex - 1, columnIndex + 1]; // Az oszlopok számai, amelyek szomszédosak az adott oszloppal
-    var hasSimilarDiv = new Map();
-    for (const column of adjacentColumns) {
-      if (blocks.has(column)) {
-        // Ellenőrizd, hogy létezik-e az adott oszlop
-        const divs = blocks.get(column); // Az oszlopban található div elemek tömbje
-        console.log(column);
-        /* for (const div of divs) {
-          if (div.style.backgroundColor == color) {
-            // Ellenőrizd, hogy az adott div elemnek van-e kék háttérszíne
-            console.log(div);
-            hasSimilarDiv = true;
-          }
-        }*/
-        hasSimilarDiv.set(column, []);
-        for (let i = divs.length - 1; i >= 0; i--) {
-          if (divs[i].style.backgroundColor == color) {
-            console.log(divs[i]);
-            //hasSimilarDiv.set(column,[{index: i, block: divs[i]}]);
-            hasSimilarDiv.get(column).push({index: i, block: divs[i]});
-          }
-        }
-      }
-    }
-    return hasSimilarDiv;
+  function showScore(score) {
+    scoreEl.textContent = score;
+    console.log($(".score").html());
+    let sc = parseInt($(".score").html());
+    sc += score;
+    $(".score").html(sc);
+    scoreEl.classList.add("show");
+    scoreEl.classList.remove("hide");
+    setTimeout(hideScore, 1000);
   }
 
-  function removeBlockFromMap(map){
-    for (const [key, value] of map.entries()) {
-      console.log(key, value);
-    }
+  function hideScore() {
+    scoreEl.classList.add("hide");
+    scoreEl.classList.remove("show");
   }
 });

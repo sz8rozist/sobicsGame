@@ -101,3 +101,28 @@ body {
 .show{
   opacity: 1;
 }
+
+#score {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  font-weight: bold;
+  color: green;
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+#score.show {
+  opacity: 1;
+}
+
+#score.hide {
+  opacity: 0;
+}
+.score{
+  text-align: center;
+  color: white;
+  font-size: 26px;
+}
