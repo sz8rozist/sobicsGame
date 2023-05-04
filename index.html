@@ -14,29 +14,24 @@
   </head>
   <body>
     <div id="gamearea">
-      <!-- Trigger/Open The Modal -->
-      <button id="myBtn">Toplista</button>
-
-      <!-- The Modal -->
       <div id="myModal" class="modal">
-        <!-- Modal content -->
         <div class="modal-content">
           <div class="modal-header">
             <span class="close">&times;</span>
             <h2>Toplista</h2>
           </div>
           <div class="modal-body">
-            <ul>
-              
-            </ul>
+            <ul></ul>
           </div>
         </div>
       </div>
-
-      <div id="music" onclick="togglePlay()">
-        <i class="fa-solid fa-music fa-beat"></i> Zene
+      <div id="cont">
+        <button id="myBtn">Toplista</button>
+        <div class="level-container">Level: <span class="level">1</span></div>
+        <div id="music" onclick="togglePlay()">
+          <i class="fa-solid fa-music fa-beat"></i> Zene
+        </div>
       </div>
-      <div class="level">1</div>
       <div id="dialog" title="Üdvözöllek ez itt a Sobics!">
         <p>
           A játékot az egérrel tudod majd irányítani. Az egered fogja követni a

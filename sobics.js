@@ -19,7 +19,8 @@ myAudio.volume = 0.2;
 var isPlaying = false;
 var level = 1;
 var progressRange = 20;
-var pontszam = [8000, 16000, 20000];
+var pontszam = [8000, 16000, 24000, 32000];
+var maxPont = 40000;
 var modal = document.getElementById("myModal");
 var btn = document.getElementById("myBtn");
 var span = document.getElementsByClassName("close")[0];
@@ -184,10 +185,10 @@ $(document).ready(function () {
     var progressLabel = $(".progress-label"),
       progressbar = $("#progressbar");
     let progress = 0;
-    setInterval(function () {
+    const interval = setInterval(function () {
       progress++;
       console.log(parseInt($(".score").html()));
-      if (parseInt($(".score").html()) >= pontszam[level - 1]) {
+      if (parseInt($(".score").html()) === pontszam[level - 1]) {
         level++;
         progressRange -= 5;
         $(".level").html(level);
@@ -204,11 +205,36 @@ $(document).ready(function () {
           progressLabel.text(progress);
         },
       });
-      if (gameOver()) {
-        //meg kell ölni a palyer, eltüntetni a blokkokat, és megnyitni a toplistát
-        return;
-      }else{
-        
+      if (gameOver() || parseInt($(".score").html()) == maxPont) {
+        const data = {
+          player: playerName,
+          score: parseInt($(".score").html()),
+        };
+        if (localStorage.getItem("toplist")) {
+          var array = JSON.parse(key);
+          array.push(data);
+          localStorage.setItem("toplist", JSON.stringify(array));
+        } else {
+          localStorage.setItem("toplist", JSON.stringify([data]));
+        }
+        $("#game_over_dialog").dialog({
+          autoOpen: true,
+          show: {
+            effect: "blind",
+            duration: 1000,
+          },
+          hide: {
+            effect: "explode",
+            duration: 1000,
+          },
+          resizable: false,
+          buttons: {
+            "Játék újrakezdése": function () {
+              location.reload();
+            },
+          },
+        });
+        clearInterval(interval);
       }
     }, 1000);
   }
