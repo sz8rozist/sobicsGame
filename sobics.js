@@ -20,6 +20,9 @@ var isPlaying = false;
 var level = 1;
 var progressRange = 20;
 var pontszam = [8000, 16000, 20000];
+var modal = document.getElementById("myModal");
+var btn = document.getElementById("myBtn");
+var span = document.getElementsByClassName("close")[0];
 
 function togglePlay() {
   isPlaying ? myAudio.pause() : myAudio.play();
@@ -31,9 +34,24 @@ myAudio.onplaying = function () {
 myAudio.onpause = function () {
   isPlaying = false;
 };
+
+btn.onclick = function () {
+  modal.style.display = "block";
+};
+
+span.onclick = function () {
+  modal.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
 $(document).ready(function () {
   $("#dialog").dialog({
     autoOpen: true,
+    dragabble: false,
     show: {
       effect: "blind",
       duration: 1000,
@@ -98,16 +116,15 @@ $(document).ready(function () {
     kezben_levo_blokk.addClass("hide");
     kezben_levo_blokk.css("background-color", "");
     audio.play();
-    //var neighbour = checkNeightbourColumn(columnNumber, new_block.style.backgroundColor);
-    //removeBlockFromMap(neighbour, columnNumber);
+
     let legutoljaraBeszurtIndex = blocks.get(columnNumber).length - 1;
     let legutoljaraBeszurt = blocks
       .get(columnNumber)
       .at(legutoljaraBeszurtIndex);
-    // console.log(legutoljaraBeszurt);
-    //console.log(columnNumber, legutoljaraBeszurtIndex);
+
     let removeBlocks = new Map();
     var count = 0;
+    const columnsToCheck = 2;
     for (const [key, value] of blocks.entries()) {
       if (key == columnNumber) {
         for (let i = value.length - 1; i >= 0; i--) {
@@ -124,36 +141,23 @@ $(document).ready(function () {
             removeBlocks.get(key).push(value[i]);
           }
         }
-      }
-      if (key == columnNumber - 1) {
-        for (let i = value.length - 1; i >= 0; i--) {
-          if (
-            value[i].style.backgroundColor !=
-            legutoljaraBeszurt.style.backgroundColor
-          ) {
-            break;
-          }
-          count++;
-          if (removeBlocks.has(key)) {
-            removeBlocks.get(key).push(value[i]);
-          } else {
-            removeBlocks.set(key, [value[i]]);
-          }
-        }
-      }
-      if (key == columnNumber + 1) {
-        for (let i = value.length - 1; i >= 0; i--) {
-          if (
-            value[i].style.backgroundColor !=
-            legutoljaraBeszurt.style.backgroundColor
-          ) {
-            break;
-          }
-          count++;
-          if (removeBlocks.has(key)) {
-            removeBlocks.get(key).push(value[i]);
-          } else {
-            removeBlocks.set(key, [value[i]]);
+      } else {
+        for (let i = 0; i < columnsToCheck; i++) {
+          if (key == columnNumber - i || key == columnNumber + i) {
+            for (let j = value.length - 1; j >= 0; j--) {
+              if (
+                value[j].style.backgroundColor !=
+                legutoljaraBeszurt.style.backgroundColor
+              ) {
+                break;
+              }
+              count++;
+              if (removeBlocks.has(key)) {
+                removeBlocks.get(key).push(value[j]);
+              } else {
+                removeBlocks.set(key, [value[j]]);
+              }
+            }
           }
         }
       }
@@ -182,14 +186,15 @@ $(document).ready(function () {
     let progress = 0;
     setInterval(function () {
       progress++;
-      if (parseInt(scoreEl.innerHTML) == pontszam[level - 1]) {
+      console.log(parseInt($(".score").html()));
+      if (parseInt($(".score").html()) >= pontszam[level - 1]) {
         level++;
         progressRange -= 5;
+        $(".level").html(level);
       }
-      console.log(parseInt(scoreEl.innerHTML));
       if (progress > progressRange) {
         progress = 0;
-        //randomBlock();
+        randomBlock();
         drawBoard();
       }
       progressbar.progressbar({
@@ -200,37 +205,10 @@ $(document).ready(function () {
         },
       });
       if (gameOver()) {
-        $("#game_over_dialog").dialog({
-          autoOpen: true,
-          show: {
-            effect: "blind",
-            duration: 1000,
-          },
-          hide: {
-            effect: "explode",
-            duration: 1000,
-          },
-          resizable: false,
-          buttons: {
-            "Top lista": function () {
-              $("#game_over_content").html(
-                "A játék véget ért kedves " +
-                  playerName +
-                  ", összesen " +
-                  score +
-                  " pontot gyűjtöttél"
-              );
-              topList.push({ name: playerName, score: score });
-              console.log(topList);
-              localStorage.setItem("toplist", JSON.stringify(topList));
-              $(this).dialog("close");
-            },
-            "Játék újrakezdése": function () {
-              location.reload();
-            },
-          },
-        });
+        //meg kell ölni a palyer, eltüntetni a blokkokat, és megnyitni a toplistát
         return;
+      }else{
+        
       }
     }, 1000);
   }
