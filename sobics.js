@@ -20,36 +20,19 @@ var isPlaying = false;
 var level = 1;
 var progressRange = 20;
 var pontszam = [8000, 16000, 24000, 32000];
-var maxPont = 40000;
 var modal = document.getElementById("myModal");
 var btn = document.getElementById("myBtn");
 var span = document.getElementsByClassName("close")[0];
+var interval;
+var level_container = $(".level-container");
+var score_container = $(".score");
 
 function togglePlay() {
   isPlaying ? myAudio.pause() : myAudio.play();
 }
-
-myAudio.onplaying = function () {
-  isPlaying = true;
-};
-myAudio.onpause = function () {
-  isPlaying = false;
-};
-
-btn.onclick = function () {
-  modal.style.display = "block";
-};
-
-span.onclick = function () {
-  modal.style.display = "none";
-};
-
-window.onclick = function (event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-};
 $(document).ready(function () {
+  level_container.hide();
+  score_container.hide();
   $("#dialog").dialog({
     autoOpen: true,
     dragabble: false,
@@ -73,6 +56,30 @@ $(document).ready(function () {
       },
     },
   });
+
+  myAudio.onplaying = function () {
+    isPlaying = true;
+  };
+  myAudio.onpause = function () {
+    isPlaying = false;
+  };
+
+  btn.onclick = function () {
+    modal.style.display = "block";
+    showTopList();
+    clearInterval(interval);
+  };
+
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
   /* Amikor az egér mozog, a kódban számítódik a deltaX értéke, amely meghatározza a child elem mozgatásának mértékét a balra és jobbra mozgatás során. Ezután kiszámítjuk a child elem új pozícióját a parent elemen belül, figyelembe véve, hogy ne lépje túl a parent elem határait */
   $("#game_container").on("mousemove", function (event) {
     var deltaX = event.pageX - currentX;
@@ -185,10 +192,10 @@ $(document).ready(function () {
     var progressLabel = $(".progress-label"),
       progressbar = $("#progressbar");
     let progress = 0;
-    const interval = setInterval(function () {
+    interval = setInterval(function () {
       progress++;
       console.log(parseInt($(".score").html()));
-      if (parseInt($(".score").html()) === pontszam[level - 1]) {
+      if (parseInt($(".score").html()) >= pontszam[level - 1]) {
         level++;
         progressRange -= 5;
         $(".level").html(level);
@@ -205,13 +212,13 @@ $(document).ready(function () {
           progressLabel.text(progress);
         },
       });
-      if (gameOver() || parseInt($(".score").html()) == maxPont) {
+      if (gameOver()) {
         const data = {
           player: playerName,
           score: parseInt($(".score").html()),
         };
         if (localStorage.getItem("toplist")) {
-          var array = JSON.parse(key);
+          var array = JSON.parse(localStorage.getItem("toplist"));
           array.push(data);
           localStorage.setItem("toplist", JSON.stringify(array));
         } else {
@@ -228,13 +235,37 @@ $(document).ready(function () {
             duration: 1000,
           },
           resizable: false,
+          dragabble: false,
           buttons: {
             "Játék újrakezdése": function () {
               location.reload();
             },
           },
         });
+        $(".game_over_content").html(
+          "Kedves " +
+            playerName +
+            " a játék sajnos számodra most véget ért, de ne csüggedj, " +
+            $(".score").html() +
+            " pontot gyűjtöttél."
+        );
         clearInterval(interval);
+        $("#gameboard").fadeOut(2000);
+        let character_img = document.getElementById("character");
+        character_img.setAttribute("src", "Dead (12).png");
+        character_img.onload = function () {
+          character_img.style.opacity = 0;
+          var fadeEffect = setInterval(function () {
+            if (!character_img.style.opacity) {
+              character_img.style.opacity = 1;
+            }
+            if (character_img.style.opacity < 1) {
+              character_img.style.opacity += 0.1;
+            } else {
+              clearInterval(fadeEffect);
+            }
+          }, 50);
+        };
       }
     }, 1000);
   }
@@ -254,7 +285,7 @@ $(document).ready(function () {
     }
 
     let character = document.createElement("img");
-    character.src = "male/Walk (5).png";
+    character.src = "Walk (5).png";
     character.style.width = "100px";
     character.style.height = "100px";
     character.setAttribute("id", "character");
@@ -269,7 +300,7 @@ $(document).ready(function () {
     if (gameboard.hasChildNodes()) {
       gameboard.textContent = "";
     }
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 19; i++) {
       for (let j = 0; j < 10; j++) {
         const block = blocks.get(j)[i]; // megkapjuk a blokkot a Map-ből
         //console.log(block);
@@ -288,7 +319,7 @@ $(document).ready(function () {
   }
 
   function randomBlock() {
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 19; i++) {
       for (let j = 0; j < 10; j++) {
         const block = document.createElement("div");
         block.classList.add("block");
@@ -303,9 +334,9 @@ $(document).ready(function () {
   }
 
   function gameOver() {
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 19; i++) {
       for (let j = 0; j < 10; j++) {
-        if (blocks.get(j).length == 16) {
+        if (blocks.get(j).length == 19) {
           return true;
         }
       }
@@ -321,6 +352,8 @@ $(document).ready(function () {
     mapFeltolt();
     drawBoard();
     $("#progressbar").addClass("animate");
+    level_container.fadeIn(500);
+    score_container.fadeIn(500);
     timer();
   }
 
@@ -337,5 +370,21 @@ $(document).ready(function () {
   function hideScore() {
     scoreEl.classList.add("hide");
     scoreEl.classList.remove("show");
+  }
+
+  function showTopList() {
+    let toplist_modal_body = $("#toplist-modal-body");
+    if (!localStorage.getItem("toplist")) {
+      toplist_modal_body.append("<p><strong>Üres a toplista!</strong></p>");
+      return;
+    }
+
+    let toplist = JSON.parse(localStorage.getItem("toplist"));
+    let list = $("<ol>");
+    for (const key in toplist) {
+      let li = $("<li>").html(toplist[key].player + ": " + toplist[key].score);
+      list.append(li);
+    }
+    toplist_modal_body.append(list);
   }
 });
