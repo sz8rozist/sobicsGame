@@ -73,6 +73,7 @@ $(document).ready(function () {
 
   span.onclick = function () {
     modal.style.display = "none";
+    timer();
   };
 
   window.onclick = function (event) {
@@ -387,6 +388,9 @@ $(document).ready(function () {
     for (const key in toplist) {
       let li = $("<li>").html(toplist[key].player + ": " + toplist[key].score);
       list.append(li);
+    }
+    if(toplist_modal_body.children().length > 0){
+      toplist_modal_body.empty();
     }
     toplist_modal_body.append(list);
   }
