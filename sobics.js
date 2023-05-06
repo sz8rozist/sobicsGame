@@ -18,8 +18,9 @@ var myAudio = document.getElementById("myAudio");
 myAudio.volume = 0.2;
 var isPlaying = false;
 var level = 1;
-var progressRange = 20;
-var pontszam = [8000, 16000, 24000, 32000];
+var progressRange = 25;
+var pontszam = [8000, 16000, 24000, 32000, 40000];
+const maxPont = 40000;
 var modal = document.getElementById("myModal");
 var btn = document.getElementById("myBtn");
 var span = document.getElementsByClassName("close")[0];
@@ -212,7 +213,7 @@ $(document).ready(function () {
           progressLabel.text(progress);
         },
       });
-      if (gameOver()) {
+      if (gameOver() || parseInt($(".score").html()) >= maxPont) {
         const data = {
           player: playerName,
           score: parseInt($(".score").html()),
@@ -251,21 +252,23 @@ $(document).ready(function () {
         );
         clearInterval(interval);
         $("#gameboard").fadeOut(2000);
-        let character_img = document.getElementById("character");
-        character_img.setAttribute("src", "Dead (12).png");
-        character_img.onload = function () {
-          character_img.style.opacity = 0;
-          var fadeEffect = setInterval(function () {
-            if (!character_img.style.opacity) {
-              character_img.style.opacity = 1;
-            }
-            if (character_img.style.opacity < 1) {
-              character_img.style.opacity += 0.1;
-            } else {
-              clearInterval(fadeEffect);
-            }
-          }, 50);
-        };
+        if (gameOver()) {
+          let character_img = document.getElementById("character");
+          character_img.setAttribute("src", "Dead (12).png");
+          character_img.onload = function () {
+            character_img.style.opacity = 0;
+            var fadeEffect = setInterval(function () {
+              if (!character_img.style.opacity) {
+                character_img.style.opacity = 1;
+              }
+              if (character_img.style.opacity < 1) {
+                character_img.style.opacity += 0.1;
+              } else {
+                clearInterval(fadeEffect);
+              }
+            }, 50);
+          };
+        }
       }
     }, 1000);
   }
