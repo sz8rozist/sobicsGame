@@ -214,18 +214,8 @@ $(document).ready(function () {
           progressLabel.text(progress);
         },
       });
-      if (gameOver() || parseInt($(".score").html()) >= maxPont) {
-        const data = {
-          player: playerName,
-          score: parseInt($(".score").html()),
-        };
-        if (localStorage.getItem("toplist")) {
-          var array = JSON.parse(localStorage.getItem("toplist"));
-          array.push(data);
-          localStorage.setItem("toplist", JSON.stringify(array));
-        } else {
-          localStorage.setItem("toplist", JSON.stringify([data]));
-        }
+      if (gameOver()) {
+        saveTopList();
         $("#game_over_dialog").dialog({
           autoOpen: true,
           show: {
@@ -270,6 +260,33 @@ $(document).ready(function () {
             }, 50);
           };
         }
+      } else if (parseInt($(".score").html()) >= maxPont) {
+        saveTopList();
+        $("#succes_dialog").dialog({
+          autoOpen: true,
+          show: {
+            effect: "blind",
+            duration: 1000,
+          },
+          hide: {
+            effect: "explode",
+            duration: 1000,
+          },
+          resizable: false,
+          dragabble: false,
+          buttons: {
+            "Játék újrakezdése": function () {
+              location.reload();
+            },
+          },
+        });
+        $(".succes_dialog_content").html(
+          "Kedves " +
+            playerName +
+            " gratulálok elérted a maximálisan megszerezhető pontot!"
+        );
+        clearInterval(interval);
+        $("#gameboard").fadeOut(2000);
       }
     }, 1000);
   }
@@ -376,6 +393,20 @@ $(document).ready(function () {
     scoreEl.classList.remove("show");
   }
 
+  function saveTopList() {
+    const data = {
+      player: playerName,
+      score: parseInt($(".score").html()),
+    };
+    if (localStorage.getItem("toplist")) {
+      var array = JSON.parse(localStorage.getItem("toplist"));
+      array.push(data);
+      localStorage.setItem("toplist", JSON.stringify(array));
+    } else {
+      localStorage.setItem("toplist", JSON.stringify([data]));
+    }
+  }
+
   function showTopList() {
     let toplist_modal_body = $("#toplist-modal-body");
     if (!localStorage.getItem("toplist")) {
@@ -389,7 +420,7 @@ $(document).ready(function () {
       let li = $("<li>").html(toplist[key].player + ": " + toplist[key].score);
       list.append(li);
     }
-    if(toplist_modal_body.children().length > 0){
+    if (toplist_modal_body.children().length > 0) {
       toplist_modal_body.empty();
     }
     toplist_modal_body.append(list);
